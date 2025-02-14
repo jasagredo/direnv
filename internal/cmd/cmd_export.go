@@ -45,7 +45,7 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 
 	logDebug("loading RCs")
 	loadedRC := config.LoadedRC()
-	toLoad := findEnvUp(config.WorkDir, config.LoadDotenv)
+	toLoad := msys2(findEnvUp(config.WorkDir, config.LoadDotenv))
 
 	if loadedRC == nil && toLoad == "" {
 		return
@@ -104,7 +104,7 @@ func exportCommand(currentEnv Env, args []string, config *Config) (err error) {
 		logStatus(config, "export %s", out)
 	}
 
-	diffString := currentEnv.Diff(newEnv).ToShell(shell)
+	diffString := currentEnv.Diff(newEnv).ToShell(currentEnv, shell)
 	logDebug("env diff %s", diffString)
 	fmt.Print(diffString)
 

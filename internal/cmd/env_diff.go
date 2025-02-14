@@ -25,6 +25,14 @@ var IgnoredKeys = map[string]bool{
 	"SHELLOPTS": true,
 	"SHLVL":     true,
 	"_":         true,
+	"!C:/msys64/c": true,
+	"!/c/msys64/c": true,
+	"":             true,
+        "HOMEDRIVE":    true,
+        "HOMEPATH":     true,
+        "LOGONSERVER":  true,
+        "SYSTEMDRIVE":  true,
+
 }
 
 // EnvDiff represents the diff between two environments
@@ -84,7 +92,7 @@ func (diff *EnvDiff) Any() bool {
 // ToShell applies the env diff as a set of commands that are understood by
 // the target `shell`. The outputted string is then meant to be evaluated in
 // the target shell.
-func (diff *EnvDiff) ToShell(shell Shell) string {
+func (diff *EnvDiff) ToShell(env Env, shell Shell) string {
 	e := make(ShellExport)
 
 	for key := range diff.Prev {
@@ -95,7 +103,7 @@ func (diff *EnvDiff) ToShell(shell Shell) string {
 	}
 
 	for key, value := range diff.Next {
-		e.Add(key, value)
+		e.Add(key, msys2(value))
 	}
 
 	return shell.Export(e)
@@ -115,7 +123,7 @@ func (diff *EnvDiff) Patch(env Env) (newEnv Env) {
 	}
 
 	for key, value := range diff.Next {
-		newEnv[key] = value
+		newEnv[key] = msys2(value)
 	}
 
 	return newEnv

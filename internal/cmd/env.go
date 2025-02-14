@@ -25,7 +25,7 @@ func GetEnv() Env {
 		key := kv2[0]
 		value := kv2[1]
 
-		env[key] = value
+		env[key] = msys2(value)
 	}
 
 	return env
@@ -75,7 +75,8 @@ func (env Env) ToGoEnv() []string {
 	goEnv := make([]string, len(env))
 	index := 0
 	for key, value := range env {
-		goEnv[index] = strings.Join([]string{key, value}, "=")
+		value1 := msys2(value)
+		goEnv[index] = strings.Join([]string{key, value1}, "=")
 		index++
 	}
 	return goEnv
@@ -113,4 +114,21 @@ func (env Env) Fetch(key, def string) string {
 		v = def
 	}
 	return v
+}
+
+
+func msys2(value string) string {
+	if os.Getenv("MSYSTEM") != "" {
+		value2 := strings.ReplaceAll(value, `\`, "/")
+		value3 := strings.ReplaceAll(value2, "C:", "/c")
+		return strings.ReplaceAll(value3, ";", ":")
+	} else {
+		return value
+	}
+}
+
+func unmsys2(value string) string {
+        value1 := strings.ReplaceAll(value, ";", ":")
+	value2 := strings.ReplaceAll(value1, "/c/", "C:/")
+	return strings.ReplaceAll(value2, "/", `\`)
 }

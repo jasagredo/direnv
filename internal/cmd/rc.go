@@ -52,7 +52,7 @@ func RCFromPath(path string, config *Config) (*RC, error) {
 
 	times := NewFileTimes()
 
-	err = times.Update(path)
+	err = times.Update(unmsys2(path))
 	if err != nil {
 		return nil, err
 	}
@@ -268,7 +268,7 @@ func (rc *RC) Load(previousEnv Env) (newEnv Env, err error) {
 
 	// G204: Subprocess launched with function call as argument or cmd arguments
 	// #nosec
-	cmd := exec.CommandContext(ctx, config.BashPath, "-c", arg)
+	cmd := exec.CommandContext(ctx, strings.ReplaceAll(config.BashPath, "/c", "C:"), "-c", arg)
 	cmd.Dir = wd
 	cmd.Env = newEnv.ToGoEnv()
 	cmd.Stdin = stdin
@@ -332,11 +332,12 @@ func fileExists(path string) bool {
 }
 
 func fileHash(path string) (hash string, err error) {
-	if path, err = filepath.Abs(path); err != nil {
+        path1 := unmsys2(path)
+	if path, err = filepath.Abs(path1); err != nil {
 		return
 	}
 
-	fd, err := os.Open(path)
+	fd, err := os.Open(path1)
 	if err != nil {
 		return
 	}

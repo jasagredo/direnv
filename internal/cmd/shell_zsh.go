@@ -31,7 +31,7 @@ func (sh zsh) Export(e ShellExport) (out string) {
 		if value == nil {
 			out += sh.unset(key)
 		} else {
-			out += sh.export(key, *value)
+			out += sh.export(key, msys2(*value))
 		}
 	}
 	return out
@@ -39,7 +39,7 @@ func (sh zsh) Export(e ShellExport) (out string) {
 
 func (sh zsh) Dump(env Env) (out string) {
 	for key, value := range env {
-		out += sh.export(key, value)
+		out += sh.export(key, msys2(value))
 	}
 	return out
 }
@@ -49,7 +49,11 @@ func (sh zsh) export(key, value string) string {
 }
 
 func (sh zsh) unset(key string) string {
-	return "unset " + sh.escape(key) + ";"
+	if key != "!/c/msys64/c" && key != "" {
+		return "unset " + sh.escape(key) + ";"
+	} else {
+		return ""
+	}
 }
 
 func (sh zsh) escape(str string) string {

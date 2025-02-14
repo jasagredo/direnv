@@ -258,7 +258,8 @@ func (config *Config) LoadedRC() *RC {
 
 // EnvFromRC loads an RC from a specified path and returns the new environment
 func (config *Config) EnvFromRC(path string, previousEnv Env) (Env, error) {
-	rc, err := RCFromPath(path, config)
+        path1 := unmsys2(path)
+	rc, err := RCFromPath(path1, config)
 	if err != nil {
 		return nil, err
 	}
